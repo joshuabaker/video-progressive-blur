@@ -67,7 +67,11 @@ export function createPreviewController(initialOpts: ComposeOptions): PreviewCon
       }
     },
     setEnabled(e) {
+      if (enabled === e) return;
       enabled = e;
+      if (!enabled && ctx && canvas) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+      }
     },
   };
 }
