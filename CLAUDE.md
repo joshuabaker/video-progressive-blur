@@ -8,6 +8,25 @@ A browser-only tool that bakes a progressive blur and a tinted gradient into one
 
 The pipeline runs entirely client-side via WebCodecs and [Mediabunny](https://mediabunny.dev). No server.
 
+## Architecture
+
+```
+File → Mediabunny Input
+         ↓
+       Conversion.init({ video.process: composeFrame })
+         ↓ (per frame)
+       VideoSample.draw → OffscreenCanvas
+       sampleDominantColor (within the edge × coverage region)
+       drawGradient (tinted, alpha 0 at the inner edge → opacity at the outer edge)
+       progressive blur (N stacked layers with mask gradients)
+         ↓
+       Mediabunny re-encodes to MP4 with matched codec + bitrate
+         ↓
+       BufferTarget → Blob → download
+```
+
+Audio passes through Mediabunny's conversion untouched. The video codec is matched to the source when the browser can encode it (`canEncodeVideo`); otherwise it falls back to AVC.
+
 ## Key files
 
 | File | Role |
@@ -50,6 +69,8 @@ For a custom domain, add `public/CNAME` and set `VITE_BASE=/` in the workflow en
 
 WebCodecs `VideoEncoder` + `VideoDecoder` required. The app warns the user if the API is missing. Targets: Chrome / Edge, Safari 16.4+, Firefox 130+. The AAC encoder polyfill (`@mediabunny/aac-encoder`) auto-registers when native AAC encoding isn't available (mainly Safari).
 
+HEVC source files: decoding works in Safari but not always in Chrome. Test in your target browser if your source isn't H.264.
+
 ## Testing strategy
 
 - **Unit tests** (`vitest`) cover the pure helpers in `color.ts`. Run with `npm run test`.
@@ -65,3 +86,12 @@ WebCodecs `VideoEncoder` + `VideoDecoder` required. The app warns the user if th
 ## Canvas blur cap workaround
 
 `ctx.filter = 'blur(Npx)'` clamps internally around 200–300 px. For radii > 32 px the compositor downsamples the source by `floor(blurPx / 8)`, applies a small filter blur, and bilinearly upsamples — bypassing the kernel cap. If you change this threshold, recheck the visual feel at the slider's max (currently 128 px).
+
+## Why this stack
+
+- **Mediabunny over Remotion** — Remotion is great for compositing animations from React components. For "decode an existing video, modify each frame, re-encode preserving everything," Mediabunny's `Conversion.process` callback is purpose-built. Remotion is itself migrating its parser/encoder internals onto Mediabunny.
+- **Hand-rolled blur over `react-progressive-blur`** — that library uses CSS `backdrop-filter`, which only works in the DOM. The compositor here ports its multi-tier mask technique to `OffscreenCanvas` so the result can be baked into the video.
+
+## Memory limits
+
+Output uses `BufferTarget`, so the whole MP4 is held in memory while encoding. Fine for short thumbnail clips. If we ever need longer files, swap to `StreamTarget` with `showSaveFilePicker`'s writable stream.
