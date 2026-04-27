@@ -35,7 +35,7 @@ export function Controls({ value, onChange, disabled }: Props) {
         <input
           type="range"
           min={0}
-          max={512}
+          max={128}
           step={1}
           value={value.maxBlurPx}
           disabled={disabled}
