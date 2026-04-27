@@ -200,6 +200,20 @@ button { font: inherit; }
   padding: 6px 8px;
 }
 
+.controls__reset {
+  align-self: flex-start;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  margin-top: 4px;
+}
+.controls__reset:hover:not(:disabled) { color: var(--text); border-color: var(--accent); }
+.controls__reset:disabled { opacity: 0.4; cursor: default; }
+
 .actions {
   display: flex;
   flex-direction: column;

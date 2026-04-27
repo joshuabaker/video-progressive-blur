@@ -1,4 +1,5 @@
-import type { ComposeOptions } from '../lib/compose';
+import type { ComposeOptions, Edge } from '../lib/compose';
+import { DEFAULT_OPTIONS } from '../lib/compose';
 
 type Props = {
   value: ComposeOptions;
@@ -6,25 +7,51 @@ type Props = {
   disabled?: boolean;
 };
 
+const EDGES: { value: Edge; label: string }[] = [
+  { value: 'bottom', label: 'Bottom' },
+  { value: 'top', label: 'Top' },
+  { value: 'left', label: 'Left' },
+  { value: 'right', label: 'Right' },
+];
+
 export function Controls({ value, onChange, disabled }: Props) {
   const set = <K extends keyof ComposeOptions>(key: K, v: ComposeOptions[K]) => {
     onChange({ ...value, [key]: v });
   };
 
+  const isDefault = (Object.keys(DEFAULT_OPTIONS) as (keyof ComposeOptions)[]).every(
+    (k) => value[k] === DEFAULT_OPTIONS[k],
+  );
+
   return (
     <div className="controls" aria-disabled={disabled}>
       <label className="control">
+        <span className="control__label">Edge</span>
+        <select
+          value={value.edge}
+          disabled={disabled}
+          onChange={(e) => set('edge', e.target.value as Edge)}
+        >
+          {EDGES.map((e) => (
+            <option key={e.value} value={e.value}>
+              {e.label}
+            </option>
+          ))}
+        </select>
+      </label>
+
+      <label className="control">
         <span className="control__label">
-          Bottom region <em>{value.bottomPercent}%</em>
+          Blur coverage <em>{value.coveragePercent}%</em>
         </span>
         <input
           type="range"
-          min={5}
-          max={70}
+          min={0}
+          max={100}
           step={1}
-          value={value.bottomPercent}
+          value={value.coveragePercent}
           disabled={disabled}
-          onChange={(e) => set('bottomPercent', Number(e.target.value))}
+          onChange={(e) => set('coveragePercent', Number(e.target.value))}
         />
       </label>
 
@@ -102,6 +129,15 @@ export function Controls({ value, onChange, disabled }: Props) {
           />
         </label>
       )}
+
+      <button
+        type="button"
+        className="controls__reset"
+        onClick={() => onChange({ ...DEFAULT_OPTIONS })}
+        disabled={disabled || isDefault}
+      >
+        Reset to defaults
+      </button>
     </div>
   );
 }

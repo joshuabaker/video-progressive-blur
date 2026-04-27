@@ -12,7 +12,12 @@ function loadOptions(): ComposeOptions {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return DEFAULT_OPTIONS;
-    const parsed = JSON.parse(raw);
+    const parsed = JSON.parse(raw) as Partial<ComposeOptions> & { bottomPercent?: number };
+    // Migrate legacy `bottomPercent` field name.
+    if (parsed.coveragePercent === undefined && typeof parsed.bottomPercent === 'number') {
+      parsed.coveragePercent = parsed.bottomPercent;
+    }
+    delete parsed.bottomPercent;
     return { ...DEFAULT_OPTIONS, ...parsed };
   } catch {
     return DEFAULT_OPTIONS;
@@ -161,8 +166,9 @@ export default function App() {
       <header className="app__header">
         <h1>Video Progressive Blur</h1>
         <p>
-          Bake a progressive blur and tinted gradient into the bottom of an MP4. The original
-          codec, dimensions, frame rate, and bitrate are preserved as closely as possible.
+          Bake a progressive blur and tinted gradient into the edge of an MP4. The original
+          codec, dimensions, frame rate, and bitrate are preserved as closely as possible. All
+          processing happens in your browser — no upload.
         </p>
       </header>
 
@@ -315,8 +321,7 @@ export default function App() {
 
       <footer className="app__footer">
         <small>
-          Built with <a href="https://mediabunny.dev">Mediabunny</a>. All processing happens in
-          your browser — no upload.
+          Made by <a href="https://joshuabaker.com">Joshua Baker</a>
         </small>
       </footer>
     </div>
