@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Dropzone } from './components/Dropzone';
 import { Controls } from './components/Controls';
+import { VideoControls } from './components/VideoControls';
 import { DEFAULT_OPTIONS, type ComposeOptions } from './lib/compose';
 import { createPreviewController, type PreviewController } from './lib/preview';
 import { inspectSource, startRender, type SourceInfo } from './lib/render';
@@ -201,7 +202,6 @@ export default function App() {
               <video
                 ref={videoRef}
                 src={sourceUrl ?? undefined}
-                controls
                 loop
                 muted
                 autoPlay
@@ -212,6 +212,7 @@ export default function App() {
                 ref={canvasRef}
                 className={`preview__canvas${previewEnabled ? '' : ' preview__canvas--hidden'}`}
               />
+              <VideoControls videoRef={videoRef} />
             </div>
             <label className="preview__toggle">
               <input
