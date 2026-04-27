@@ -98,7 +98,6 @@ button { font: inherit; }
   position: relative;
   background: #000;
   overflow: hidden;
-  border: 1px solid var(--border);
   aspect-ratio: 16 / 9;
 }
 .preview video {
