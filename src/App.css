@@ -88,6 +88,12 @@ button { font: inherit; }
   .workspace { grid-template-columns: 1fr; }
 }
 
+.preview-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
 .preview {
   position: relative;
   background: #000;
@@ -109,20 +115,17 @@ button { font: inherit; }
   pointer-events: none;
   object-fit: contain;
 }
+.preview__canvas--hidden { display: none; }
 .preview__toggle {
-  position: absolute;
-  bottom: 12px; right: 12px;
-  background: rgba(0,0,0,0.55);
-  color: var(--text);
-  padding: 6px 10px;
-  border-radius: 999px;
-  font-size: 12px;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  gap: 8px;
+  font-size: 13px;
+  color: var(--muted);
+  cursor: pointer;
+  user-select: none;
 }
+.preview__toggle input { accent-color: var(--accent); }
 
 .sidebar {
   display: flex;

@@ -190,17 +190,22 @@ export default function App() {
         </>
       ) : (
         <div className="workspace">
-          <div className="preview">
-            <video
-              ref={videoRef}
-              src={sourceUrl ?? undefined}
-              controls
-              loop
-              muted
-              playsInline
-              crossOrigin="anonymous"
-            />
-            <canvas ref={canvasRef} className="preview__canvas" />
+          <div className="preview-wrap">
+            <div className="preview">
+              <video
+                ref={videoRef}
+                src={sourceUrl ?? undefined}
+                controls
+                loop
+                muted
+                playsInline
+                crossOrigin="anonymous"
+              />
+              <canvas
+                ref={canvasRef}
+                className={`preview__canvas${previewEnabled ? '' : ' preview__canvas--hidden'}`}
+              />
+            </div>
             <label className="preview__toggle">
               <input
                 type="checkbox"
