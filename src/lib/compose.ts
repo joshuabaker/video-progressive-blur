@@ -23,7 +23,7 @@ export const DEFAULT_OPTIONS: ComposeOptions = {
   coveragePercent: 33,
   maxBlurPx: 12,
   gradientOpacity: 0.6,
-  blurLayers: 6,
+  blurLayers: 10,
   colorMode: 'batched',
   colorBatchFrames: 12,
   manualColor: { r: 0, g: 0, b: 0 },

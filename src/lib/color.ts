@@ -54,5 +54,5 @@ export function hexToRgb(hex: string): RGB {
 export function rgbToHex(rgb: RGB): string {
   const c = (n: number) =>
     Math.max(0, Math.min(255, Math.round(n))).toString(16).padStart(2, '0');
-  return `#${c(rgb.r)}${c(rgb.g)}${c(rgb.b)}`;
+  return `#${c(rgb.r)}${c(rgb.g)}${c(rgb.b)}`.toUpperCase();
 }

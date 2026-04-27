@@ -50,6 +50,7 @@ export default function App() {
   const [opts, setOpts] = useState<ComposeOptions>(() => loadOptions());
   const [render, setRender] = useState<RenderState>({ kind: 'idle' });
   const [previewEnabled, setPreviewEnabled] = useState(true);
+  const [showControls, setShowControls] = useState(true);
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -213,15 +214,27 @@ export default function App() {
                 className={`preview__canvas${previewEnabled ? '' : ' preview__canvas--hidden'}`}
               />
             </div>
-            <VideoControls videoRef={videoRef} />
-            <label className="preview__toggle">
-              <input
-                type="checkbox"
-                checked={previewEnabled}
-                onChange={(e) => setPreviewEnabled(e.target.checked)}
-              />
-              Live preview overlay
-            </label>
+            {showControls && (
+              <VideoControls videoRef={videoRef} frameRate={info?.averageFrameRate} />
+            )}
+            <div className="preview__toggles">
+              <label className="preview__toggle">
+                <input
+                  type="checkbox"
+                  checked={previewEnabled}
+                  onChange={(e) => setPreviewEnabled(e.target.checked)}
+                />
+                Live preview
+              </label>
+              <label className="preview__toggle">
+                <input
+                  type="checkbox"
+                  checked={showControls}
+                  onChange={(e) => setShowControls(e.target.checked)}
+                />
+                Video controls
+              </label>
+            </div>
           </div>
 
           <aside className="sidebar">

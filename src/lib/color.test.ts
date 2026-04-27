@@ -74,7 +74,7 @@ describe('hexToRgb', () => {
 });
 
 describe('rgbToHex', () => {
-  it('round-trips through hexToRgb', () => {
+  it('round-trips through hexToRgb (case-insensitive parsing)', () => {
     const colors = [
       { r: 0, g: 0, b: 0 },
       { r: 255, g: 255, b: 255 },
@@ -83,8 +83,11 @@ describe('rgbToHex', () => {
     ];
     for (const c of colors) expect(hexToRgb(rgbToHex(c))).toEqual(c);
   });
-  it('clamps out-of-range channels', () => {
-    expect(rgbToHex({ r: -10, g: 999, b: 128 })).toBe('#00ff80');
+  it('clamps out-of-range channels and uppercases output', () => {
+    expect(rgbToHex({ r: -10, g: 999, b: 128 })).toBe('#00FF80');
+  });
+  it('uppercases hex output', () => {
+    expect(rgbToHex({ r: 255, g: 136, b: 0 })).toBe('#FF8800');
   });
 });
 

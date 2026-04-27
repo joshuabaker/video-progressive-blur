@@ -1,7 +1,8 @@
-import { useEffect, useState, type RefObject } from 'react';
+import { useEffect, useRef, useState, type RefObject } from 'react';
 
 type Props = {
   videoRef: RefObject<HTMLVideoElement | null>;
+  frameRate?: number;
 };
 
 // Phosphor icons (fill, 256-grid, MIT) — inlined to avoid the dep.
@@ -26,39 +27,45 @@ function PauseIcon() {
   );
 }
 
-const fmt = (s: number) => {
-  if (!isFinite(s) || s < 0) return '0:00';
-  const m = Math.floor(s / 60);
-  const r = Math.floor(s % 60);
-  return `${m}:${r.toString().padStart(2, '0')}`;
-};
-
-export function VideoControls({ videoRef }: Props) {
+export function VideoControls({ videoRef, frameRate }: Props) {
   const [playing, setPlaying] = useState(false);
   const [time, setTime] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [dragging, setDragging] = useState(false);
+  const draggingRef = useRef(false);
+
+  // Drive `time` from rAF rather than the sparse `timeupdate` event so the
+  // scrub bar keeps moving every paint frame. CSS handles the smoothing
+  // between the discrete frame-aligned steps.
+  useEffect(() => {
+    const v = videoRef.current;
+    if (!v) return;
+    let raf = 0;
+    const tick = () => {
+      if (!draggingRef.current) setTime(v.currentTime);
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [videoRef]);
 
   useEffect(() => {
     const v = videoRef.current;
     if (!v) return;
     const onPlay = () => setPlaying(true);
     const onPause = () => setPlaying(false);
-    const onTime = () => setTime(v.currentTime);
     const onMeta = () => {
       setDuration(isFinite(v.duration) ? v.duration : 0);
-      setTime(v.currentTime);
       setPlaying(!v.paused);
     };
     v.addEventListener('play', onPlay);
     v.addEventListener('pause', onPause);
-    v.addEventListener('timeupdate', onTime);
     v.addEventListener('loadedmetadata', onMeta);
     v.addEventListener('durationchange', onMeta);
     onMeta();
     return () => {
       v.removeEventListener('play', onPlay);
       v.removeEventListener('pause', onPause);
-      v.removeEventListener('timeupdate', onTime);
       v.removeEventListener('loadedmetadata', onMeta);
       v.removeEventListener('durationchange', onMeta);
     };
@@ -78,6 +85,28 @@ export function VideoControls({ videoRef }: Props) {
     setTime(t);
   };
 
+  // Frame-snapped progress: the bar advances on whole frame boundaries.
+  // Falls back to time ratio when frame rate isn't known yet.
+  let pct = 0;
+  if (duration > 0) {
+    if (frameRate && frameRate > 0) {
+      const totalFrames = Math.max(1, Math.round(duration * frameRate));
+      const currentFrame = Math.min(totalFrames, Math.floor(time * frameRate));
+      pct = (currentFrame / totalFrames) * 100;
+    } else {
+      pct = Math.min(100, (time / duration) * 100);
+    }
+  }
+
+  const startDrag = () => {
+    draggingRef.current = true;
+    setDragging(true);
+  };
+  const endDrag = () => {
+    draggingRef.current = false;
+    setDragging(false);
+  };
+
   return (
     <div className="vc">
       <button
@@ -90,20 +119,21 @@ export function VideoControls({ videoRef }: Props) {
       </button>
       <input
         type="range"
-        className="vc__bar"
+        className={`vc__bar${dragging ? ' vc__bar--dragging' : ''}`}
         min={0}
         max={duration || 0}
         step={0.001}
         value={Math.min(time, duration || 0)}
         onChange={(e) => seek(Number(e.target.value))}
-        aria-label="Seek"
-        style={{
-          ['--vc-progress' as string]: duration > 0 ? `${(time / duration) * 100}%` : '0%',
+        onPointerDown={startDrag}
+        onPointerUp={endDrag}
+        onPointerCancel={endDrag}
+        onPointerLeave={() => {
+          if (draggingRef.current) endDrag();
         }}
+        aria-label="Seek"
+        style={{ ['--vc-progress' as string]: `${pct}%` }}
       />
-      <span className="vc__time">
-        {fmt(time)} / {fmt(duration)}
-      </span>
     </div>
   );
 }

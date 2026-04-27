@@ -102,7 +102,7 @@ export function Controls({ value, onChange, disabled }: Props) {
       </label>
 
       <label className="control">
-        <span className="control__label">Colour source</span>
+        <span className="control__label">Color source</span>
         <select
           value={value.colorMode}
           disabled={disabled}
@@ -135,11 +135,11 @@ export function Controls({ value, onChange, disabled }: Props) {
       {value.colorMode === 'manual' && (
         <label className="control">
           <span className="control__label">
-            Colour <em>{rgbToHex(value.manualColor)}</em>
+            Color <em>{rgbToHex(value.manualColor)}</em>
           </span>
           <input
             type="color"
-            value={rgbToHex(value.manualColor)}
+            value={rgbToHex(value.manualColor).toLowerCase()}
             disabled={disabled}
             onChange={(e) => set('manualColor', hexToRgb(e.target.value))}
           />

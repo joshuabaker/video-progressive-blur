@@ -115,6 +115,12 @@ button { font: inherit; }
 }
 .preview__canvas--hidden { display: none; }
 
+@property --vc-progress {
+  syntax: '<percentage>';
+  inherits: false;
+  initial-value: 0%;
+}
+
 .vc {
   display: flex;
   align-items: center;
@@ -153,7 +159,9 @@ button { font: inherit; }
   border-radius: 999px;
   outline: none;
   cursor: pointer;
+  transition: --vc-progress 120ms linear;
 }
+.vc__bar--dragging { transition: none; }
 .vc__bar::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
@@ -171,13 +179,11 @@ button { font: inherit; }
   cursor: pointer;
 }
 
-.vc__time {
-  font-size: 11px;
-  font-variant-numeric: tabular-nums;
-  color: var(--muted);
-  flex-shrink: 0;
-  min-width: 80px;
-  text-align: right;
+.preview__toggles {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
 }
 .preview__toggle {
   display: inline-flex;
