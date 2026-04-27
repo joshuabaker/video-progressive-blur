@@ -106,10 +106,36 @@ export function createCompositor(opts: ComposeOptions, width: number, height: nu
       const featherStart = bottomStart + (regionHeight * Math.max(0, i - 0.5)) / layers;
       const layerEnd = height;
 
+      // Render a blurred copy of `main` into scratchB. Browsers clamp
+      // `ctx.filter = 'blur(Npx)'` somewhere around 200–300 px, so anything
+      // beyond that is silently capped. Workaround: downsample first, then
+      // apply a small filter blur, then upsample. Bilinear interpolation on
+      // the upscale provides most of the visual blur, and we sidestep the
+      // kernel cap entirely.
       ctxB.save();
       ctxB.clearRect(0, 0, width, height);
-      ctxB.filter = `blur(${blurPx.toFixed(2)}px)`;
-      ctxB.drawImage(main, 0, 0);
+      ctxB.imageSmoothingEnabled = true;
+      ctxB.imageSmoothingQuality = 'high';
+
+      if (blurPx <= 32) {
+        ctxB.filter = `blur(${blurPx.toFixed(2)}px)`;
+        ctxB.drawImage(main, 0, 0);
+      } else {
+        const scale = Math.max(2, Math.round(blurPx / 8));
+        const dsW = Math.max(2, Math.floor(width / scale));
+        const dsH = Math.max(2, Math.floor(height / scale));
+
+        ctxA.save();
+        ctxA.clearRect(0, 0, width, height);
+        ctxA.imageSmoothingEnabled = true;
+        ctxA.imageSmoothingQuality = 'high';
+        ctxA.drawImage(main, 0, 0, dsW, dsH);
+        ctxA.restore();
+
+        const cleanup = Math.min(blurPx / scale, 24);
+        if (cleanup >= 0.5) ctxB.filter = `blur(${cleanup.toFixed(2)}px)`;
+        ctxB.drawImage(scratchA, 0, 0, dsW, dsH, 0, 0, width, height);
+      }
       ctxB.restore();
 
       ctxA.save();
