@@ -170,7 +170,7 @@ export default function App() {
         <p>
           Bake a progressive blur and tinted gradient into the edge of an MP4. The original
           codec, dimensions, frame rate, and bitrate are preserved as closely as possible. All
-          processing happens in your browser — no upload.
+          processing happens in your browser.
         </p>
       </header>
 
