@@ -1,5 +1,6 @@
 import type { ComposeOptions, Edge } from '../lib/compose';
 import { DEFAULT_OPTIONS } from '../lib/compose';
+import { hexToRgb, rgbToHex } from '../lib/color';
 
 type Props = {
   value: ComposeOptions;
@@ -110,6 +111,7 @@ export function Controls({ value, onChange, disabled }: Props) {
           <option value="static">Static (first frame)</option>
           <option value="batched">Batched + eased</option>
           <option value="per-frame">Per frame</option>
+          <option value="manual">Manual</option>
         </select>
       </label>
 
@@ -126,6 +128,20 @@ export function Controls({ value, onChange, disabled }: Props) {
             value={value.colorBatchFrames}
             disabled={disabled}
             onChange={(e) => set('colorBatchFrames', Number(e.target.value))}
+          />
+        </label>
+      )}
+
+      {value.colorMode === 'manual' && (
+        <label className="control">
+          <span className="control__label">
+            Colour <em>{rgbToHex(value.manualColor)}</em>
+          </span>
+          <input
+            type="color"
+            value={rgbToHex(value.manualColor)}
+            disabled={disabled}
+            onChange={(e) => set('manualColor', hexToRgb(e.target.value))}
           />
         </label>
       )}

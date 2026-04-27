@@ -198,6 +198,15 @@ button { font: inherit; }
   color: var(--text);
 }
 .control input[type='range'] { width: 100%; accent-color: var(--accent); }
+.control input[type='color'] {
+  width: 100%;
+  height: 36px;
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 2px;
+  cursor: pointer;
+}
 .control select {
   background: var(--panel-2);
   color: var(--text);

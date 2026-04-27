@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { blurForLayer, dominantColorFromRgba, lerp, lerpColor } from './color';
+import { blurForLayer, dominantColorFromRgba, hexToRgb, lerp, lerpColor, rgbToHex } from './color';
 
 describe('lerp', () => {
   it('returns a at t=0 and b at t=1', () => {
@@ -57,6 +57,34 @@ describe('dominantColorFromRgba', () => {
     const flatAvg = { r: (128 + 255) / 2, g: 64, b: 64 };
     expect(out.r).toBeGreaterThan(flatAvg.r);
     expect(out.g).toBeLessThan(flatAvg.g);
+  });
+});
+
+describe('hexToRgb', () => {
+  it('parses a 6-digit hex with hash', () => {
+    expect(hexToRgb('#ff8800')).toEqual({ r: 255, g: 136, b: 0 });
+  });
+  it('parses without leading hash', () => {
+    expect(hexToRgb('00aaff')).toEqual({ r: 0, g: 170, b: 255 });
+  });
+  it('returns black for invalid input', () => {
+    expect(hexToRgb('not-a-color')).toEqual({ r: 0, g: 0, b: 0 });
+    expect(hexToRgb('#abc')).toEqual({ r: 0, g: 0, b: 0 });
+  });
+});
+
+describe('rgbToHex', () => {
+  it('round-trips through hexToRgb', () => {
+    const colors = [
+      { r: 0, g: 0, b: 0 },
+      { r: 255, g: 255, b: 255 },
+      { r: 17, g: 34, b: 51 },
+      { r: 200, g: 50, b: 25 },
+    ];
+    for (const c of colors) expect(hexToRgb(rgbToHex(c))).toEqual(c);
+  });
+  it('clamps out-of-range channels', () => {
+    expect(rgbToHex({ r: -10, g: 999, b: 128 })).toBe('#00ff80');
   });
 });
 

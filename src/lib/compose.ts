@@ -5,14 +5,17 @@ export type { RGB } from './color';
 
 export type Edge = 'top' | 'bottom' | 'left' | 'right';
 
+export type ColorMode = 'static' | 'batched' | 'per-frame' | 'manual';
+
 export type ComposeOptions = {
   edge: Edge;
   coveragePercent: number;
   maxBlurPx: number;
   gradientOpacity: number;
   blurLayers: number;
-  colorMode: 'static' | 'batched' | 'per-frame';
+  colorMode: ColorMode;
   colorBatchFrames: number;
+  manualColor: RGB;
 };
 
 export const DEFAULT_OPTIONS: ComposeOptions = {
@@ -23,6 +26,7 @@ export const DEFAULT_OPTIONS: ComposeOptions = {
   blurLayers: 6,
   colorMode: 'batched',
   colorBatchFrames: 12,
+  manualColor: { r: 0, g: 0, b: 0 },
 };
 
 const SAMPLE_SIZE = 24;
@@ -94,6 +98,9 @@ export function createCompositor(opts: ComposeOptions, width: number, height: nu
   };
 
   const updateColor = (region: Region): RGB => {
+    if (opts.colorMode === 'manual') {
+      return opts.manualColor;
+    }
     if (opts.colorMode === 'static') {
       if (!staticColorComputed) {
         cachedColor = sampleDominantColor(main, region);

@@ -43,3 +43,16 @@ export function blurForLayer(i: number, layerCount: number, maxBlurPx: number): 
   const t = (i + 1) / layers;
   return maxBlurPx * Math.pow(t, 1.5);
 }
+
+export function hexToRgb(hex: string): RGB {
+  const m = /^#?([a-f0-9]{6})$/i.exec(hex.trim());
+  if (!m) return { r: 0, g: 0, b: 0 };
+  const n = parseInt(m[1], 16);
+  return { r: (n >> 16) & 0xff, g: (n >> 8) & 0xff, b: n & 0xff };
+}
+
+export function rgbToHex(rgb: RGB): string {
+  const c = (n: number) =>
+    Math.max(0, Math.min(255, Math.round(n))).toString(16).padStart(2, '0');
+  return `#${c(rgb.r)}${c(rgb.g)}${c(rgb.b)}`;
+}
