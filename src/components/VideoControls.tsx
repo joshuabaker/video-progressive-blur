@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type RefObject } from 'react';
+import { useEffect, useState, type RefObject } from 'react';
 
 type Props = {
   videoRef: RefObject<HTMLVideoElement | null>;
@@ -31,18 +31,15 @@ export function VideoControls({ videoRef, frameRate }: Props) {
   const [playing, setPlaying] = useState(false);
   const [time, setTime] = useState(0);
   const [duration, setDuration] = useState(0);
-  const [dragging, setDragging] = useState(false);
-  const draggingRef = useRef(false);
 
   // Drive `time` from rAF rather than the sparse `timeupdate` event so the
-  // scrub bar keeps moving every paint frame. CSS handles the smoothing
-  // between the discrete frame-aligned steps.
+  // scrub bar updates every paint frame.
   useEffect(() => {
     const v = videoRef.current;
     if (!v) return;
     let raf = 0;
     const tick = () => {
-      if (!draggingRef.current) setTime(v.currentTime);
+      setTime(v.currentTime);
       raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);
@@ -98,15 +95,6 @@ export function VideoControls({ videoRef, frameRate }: Props) {
     }
   }
 
-  const startDrag = () => {
-    draggingRef.current = true;
-    setDragging(true);
-  };
-  const endDrag = () => {
-    draggingRef.current = false;
-    setDragging(false);
-  };
-
   return (
     <div className="vc">
       <button
@@ -119,18 +107,12 @@ export function VideoControls({ videoRef, frameRate }: Props) {
       </button>
       <input
         type="range"
-        className={`vc__bar${dragging ? ' vc__bar--dragging' : ''}`}
+        className="vc__bar"
         min={0}
         max={duration || 0}
         step={0.001}
         value={Math.min(time, duration || 0)}
         onChange={(e) => seek(Number(e.target.value))}
-        onPointerDown={startDrag}
-        onPointerUp={endDrag}
-        onPointerCancel={endDrag}
-        onPointerLeave={() => {
-          if (draggingRef.current) endDrag();
-        }}
         aria-label="Seek"
         style={{ ['--vc-progress' as string]: `${pct}%` }}
       />

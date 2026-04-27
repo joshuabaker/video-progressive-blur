@@ -159,9 +159,7 @@ button { font: inherit; }
   border-radius: 999px;
   outline: none;
   cursor: pointer;
-  transition: --vc-progress 120ms linear;
 }
-.vc__bar--dragging { transition: none; }
 .vc__bar::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
