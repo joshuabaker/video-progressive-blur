@@ -212,8 +212,8 @@ export default function App() {
                 ref={canvasRef}
                 className={`preview__canvas${previewEnabled ? '' : ' preview__canvas--hidden'}`}
               />
-              <VideoControls videoRef={videoRef} />
             </div>
+            <VideoControls videoRef={videoRef} />
             <label className="preview__toggle">
               <input
                 type="checkbox"
