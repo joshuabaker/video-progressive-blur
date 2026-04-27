@@ -97,7 +97,6 @@ button { font: inherit; }
 .preview {
   position: relative;
   background: #000;
-  border-radius: var(--radius);
   overflow: hidden;
   border: 1px solid var(--border);
   aspect-ratio: 16 / 9;
