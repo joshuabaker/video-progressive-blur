@@ -4,7 +4,7 @@ Bake a progressive blur and tinted gradient into one edge of an MP4 — for thum
 
 Everything runs in your browser.
 
-[![Open in browser ↗](https://img.shields.io/badge/Open_in_browser_%E2%86%97-000000?style=for-the-badge)](https://joshuabaker.github.io/video-progressive-blur/)
+[![Open in browser ↗](https://img.shields.io/badge/Open_in_browser_%E2%86%97-0969da?style=for-the-badge)](https://joshuabaker.github.io/video-progressive-blur/)
 
 ## Features
 
