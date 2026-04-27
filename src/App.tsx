@@ -105,6 +105,23 @@ export default function App() {
     setFile(f);
   };
 
+  const [sampleLoading, setSampleLoading] = useState(false);
+  const loadSample = async () => {
+    setSampleLoading(true);
+    try {
+      const url = `${import.meta.env.BASE_URL}sample.mp4`;
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`Sample not available (HTTP ${res.status}).`);
+      const blob = await res.blob();
+      const name = 'big-buck-bunny-sample.mp4';
+      handleFile(new File([blob], name, { type: 'video/mp4' }));
+    } catch (err) {
+      setRender({ kind: 'error', message: String((err as Error).message ?? err) });
+    } finally {
+      setSampleLoading(false);
+    }
+  };
+
   const handleRender = () => {
     if (!file) return;
     if (render.kind === 'done') URL.revokeObjectURL(render.url);
@@ -157,7 +174,20 @@ export default function App() {
       )}
 
       {!file ? (
-        <Dropzone onFile={handleFile} disabled={!webcodecsAvailable} />
+        <>
+          <Dropzone onFile={handleFile} disabled={!webcodecsAvailable} />
+          <div className="sample">
+            <button
+              type="button"
+              className="btn btn--ghost"
+              onClick={loadSample}
+              disabled={!webcodecsAvailable || sampleLoading}
+            >
+              {sampleLoading ? 'Loading sample…' : 'Load sample clip'}
+            </button>
+            <small>10-second Big Buck Bunny clip (CC-BY 3.0, Blender Foundation)</small>
+          </div>
+        </>
       ) : (
         <div className="workspace">
           <div className="preview">

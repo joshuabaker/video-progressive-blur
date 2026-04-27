@@ -1,4 +1,7 @@
 import type { VideoSample } from 'mediabunny';
+import { blurForLayer, dominantColorFromRgba, lerpColor, type RGB } from './color';
+
+export type { RGB } from './color';
 
 export type ComposeOptions = {
   bottomPercent: number;
@@ -17,8 +20,6 @@ export const DEFAULT_OPTIONS: ComposeOptions = {
   colorMode: 'batched',
   colorBatchFrames: 12,
 };
-
-export type RGB = { r: number; g: number; b: number };
 
 const SAMPLE_SIZE = 24;
 
@@ -57,36 +58,8 @@ export function createCompositor(opts: ComposeOptions, width: number, height: nu
       SAMPLE_SIZE,
     );
     const data = sampleCtx.getImageData(0, 0, SAMPLE_SIZE, SAMPLE_SIZE).data;
-    let rSum = 0;
-    let gSum = 0;
-    let bSum = 0;
-    let weightSum = 0;
-    for (let i = 0; i < data.length; i += 4) {
-      const r = data[i];
-      const g = data[i + 1];
-      const b = data[i + 2];
-      const max = Math.max(r, g, b);
-      const min = Math.min(r, g, b);
-      const sat = max === 0 ? 0 : (max - min) / max;
-      const weight = 0.35 + sat * 0.65;
-      rSum += r * weight;
-      gSum += g * weight;
-      bSum += b * weight;
-      weightSum += weight;
-    }
-    return {
-      r: Math.round(rSum / weightSum),
-      g: Math.round(gSum / weightSum),
-      b: Math.round(bSum / weightSum),
-    };
+    return dominantColorFromRgba(data);
   };
-
-  const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
-  const lerpColor = (a: RGB, b: RGB, t: number): RGB => ({
-    r: Math.round(lerp(a.r, b.r, t)),
-    g: Math.round(lerp(a.g, b.g, t)),
-    b: Math.round(lerp(a.b, b.b, t)),
-  });
 
   const updateColor = (): RGB => {
     if (opts.colorMode === 'static') {
@@ -126,8 +99,7 @@ export function createCompositor(opts: ComposeOptions, width: number, height: nu
     const regionHeight = height - bottomStart;
 
     for (let i = 0; i < layers; i++) {
-      const layerT = (i + 1) / layers;
-      const blurPx = opts.maxBlurPx * Math.pow(layerT, 1.5);
+      const blurPx = blurForLayer(i, layers, opts.maxBlurPx);
       if (blurPx < 0.1) continue;
 
       const layerStart = bottomStart + (regionHeight * i) / layers;

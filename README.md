@@ -18,10 +18,32 @@ Drop a video in, tweak the controls, render, download. Everything runs locally i
 
 ```bash
 npm install
+npm run fetch:sample    # optional, pulls a 10s Big Buck Bunny clip into public/
 npm run dev
 ```
 
-Then visit the printed URL.
+Then visit the printed URL. There's also a **Load sample clip** button on the dropzone if `public/sample.mp4` is present.
+
+## Test
+
+```bash
+npm run test
+```
+
+Vitest unit tests cover the pure colour and blur-curve helpers in `src/lib/color.ts`. End-to-end testing of the encode pipeline is manual against the deployed page until a Playwright suite is added.
+
+## Deploy (GitHub Pages)
+
+Push to `main` and the workflow at `.github/workflows/deploy.yml` will:
+
+1. Install dependencies
+2. Download a sample MP4 into `public/sample.mp4`
+3. Build with `GITHUB_PAGES=true` so Vite emits `/video-progressive-blur/` as the base path
+4. Upload the `dist/` artifact and deploy to Pages
+
+You'll need to do this **once** in the repo settings: **Settings → Pages → Source = "GitHub Actions"**.
+
+The deployed URL will be `https://<owner>.github.io/video-progressive-blur/`. For a custom domain, add a `public/CNAME` file and set `VITE_BASE=/` in the workflow's build step.
 
 ## Architecture
 

@@ -259,3 +259,12 @@ button { font: inherit; }
   flex-wrap: wrap;
 }
 .result__meta { color: var(--muted); font-size: 12px; }
+
+.sample {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.sample small { color: var(--muted); }
