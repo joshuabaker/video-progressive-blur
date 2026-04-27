@@ -204,6 +204,7 @@ export default function App() {
                 controls
                 loop
                 muted
+                autoPlay
                 playsInline
                 crossOrigin="anonymous"
               />
