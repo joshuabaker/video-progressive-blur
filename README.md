@@ -2,9 +2,9 @@
 
 Bake a progressive blur and tinted gradient into one edge of an MP4 — for thumbnail videos where text needs to stay legible over the affected area.
 
-→ **[joshuabaker.github.io/video-progressive-blur](https://joshuabaker.github.io/video-progressive-blur/)**
-
 Everything runs in your browser.
+
+[![Open in browser]][Link]
 
 ## Features
 
@@ -14,4 +14,6 @@ Everything runs in your browser.
 - Lossless passthrough where possible: source codec, dimensions, frame rate, and average bitrate are mirrored on the output. Audio is copied through without re-encoding.
 - Live preview, custom scrub controls, render progress + cancel, settings persisted between sessions.
 
-Made by [Joshua Baker](https://joshuabaker.com).
+[Link]: https://joshuabaker.github.io/video-progressive-blur/ 'Open the hosted app'
+
+[Open in browser]: https://img.shields.io/badge/Open_in_browser_%E2%86%97-7c9cff?style=for-the-badge
